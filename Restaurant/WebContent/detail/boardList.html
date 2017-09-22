@@ -1,0 +1,203 @@
+﻿
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+ 	<!-- 包含公共的JSP代码片段 -->
+	
+<title>无线点餐平台</title>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="style/js/jquery.js"></script>
+<script type="text/javascript" src="style/js/page_common.js"></script>
+<link href="style/css/common_style_blue.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="style/css/index_1.css" />
+</head>
+<body>
+<!-- 页面标题 -->
+<div id="TitleArea">
+	<div id="TitleArea_Head"></div>
+	<div id="TitleArea_Title">
+		<div id="TitleArea_Title_Content">
+			<img border="0" width="13" height="13" src="style/images/title_arrow.gif"/> 餐桌列表
+		</div>
+    </div>
+	<div id="TitleArea_End"></div>
+</div>
+
+
+<!-- 过滤条件 -->
+<div id="QueryArea">
+	<form action="#" method="get" onsubmit="return false;" id="myform">
+		<input type="hidden" name="method" value="search">
+		<input type="text" name="keyword" title="请输入餐桌名称">
+		<input type="submit" value="搜索" onclick="searchClick()">
+	</form>
+</div>
+
+
+<!-- 主内容区域（数据列表或表单显示） -->
+<div id="MainArea">
+    <table class="MainArea_Content" cellspacing="0" cellpadding="0">
+        <!-- 表头-->
+        <thead>
+            <tr align="center" valign="middle" id="TableTitle">
+				<td>编号</td>
+				<td>桌名</td>
+				<td>状态</td>
+				<td>预定时间</td>
+				<td>操作</td>
+			</tr>
+		</thead>	
+		<!--显示数据列表 -->
+        <tbody id="TableData">
+		
+        </tbody>
+    </table>
+	
+   <!-- 其他功能超链接 -->
+	<div id="TableTail" align="center">
+		<div class="FunctionButton"><a href="saveBoard.html">添加</a></div>
+    </div> 
+</div>
+
+<script type="text/javascript">
+
+	$(function(){
+		$.ajax({
+			type:"post",
+			url:"/Restaurant/tables",
+			dataType:"json",
+			success:function(data){
+				
+				if(data.code == 0) {
+					alert(data.msg);
+				} else {
+					var info = data.msg;
+					
+					$("#TableData").empty();
+					
+					$(info).each(function(){
+						var html = "<tr class='TableDetail1'>";
+						html += "<td align='center' id='tableId'>" + this.t_id + "</td>";
+						html += "<td align='center'> " + this.t_name + "&nbsp;</td>";
+						html += "<td align='center' id='tableState'>" + this.t_state+ "</td>";
+						html += "<td align='center' id='tableTime'>" + this.t_time+ "</td>"; 
+						html += "<td>";
+						if (this.t_state == "空闲") {
+						html += "<a href='/Restaurant/back?method=backtable&id=" + this.t_id + "' class='FunctionButton' >预定</a>";
+						} else {
+						html += "<a href='/Restaurant/back?method=backtable&id=" + this.t_id + "' class='FunctionButton' >退桌</a>";
+						}
+						html += "<a href='/Restaurant/delete?method=deltables&id=" + this.t_id + "' class='FunctionButton' >删除</a>";
+						html += "</td>";
+						html += "</tr>";
+						
+						$("#TableData").append($(html));
+					});
+					
+				}
+			
+			}
+		});
+	}); 
+	
+	
+function searchClick(){
+		
+		$.ajax({
+			type:"post",
+			url:"/Restaurant/search?method=searcht",
+			data:$("#myform").serialize(),
+			dataType:"json",
+			success:function(data){
+				if (data.code == 0) {
+					alert(data.msg);
+				} else {
+					var info = data.msg;
+					
+					$("#TableData").empty();
+					
+					$(info).each(function(){
+						
+						var html = "<tr class='TableDetail1'>";
+						html += "<td align='center' id='tableId'>" + this.t_id + "</td>";
+						html += "<td align='center'> " + this.t_name + "&nbsp;</td>";
+						html += "<td align='center' id='tableState'>" + this.t_state+ "</td>";
+						html += "<td align='center' id='tableTime'>" + this.t_time+ "</td>"; 
+						html += "<td>";
+						//html += "<a href=\"/Restaurant/book?method=del&id=" + this.t_id + "\" class=\"FunctionButton\" onclick=\"bookTable()\">预定</a>";
+						html += "<a href='/Restaurant/back?method=backtable&id=" + this.t_id + "' class='FunctionButton' >预定</a>";
+						html += "<a href='/Restaurant/delete?method=deltables&id=" + this.t_id + "' class='FunctionButton' >删除</a>";
+						html += "</td>";
+						html += "</tr>";
+						
+						$("#TableData").append($(html));
+					});
+				}
+			}
+		});
+	}
+	/* 
+	function bookTable(){
+		//alert($("#tableId").text());
+		
+		//var param = {t_id:$("#tableId").html()};
+		$.ajax({
+			type:"post",
+			url:"/Restaurant/operation?method=book&id=" + $("#tableId").text(),
+			dataType:"json",
+			success:function(data){
+				if(data.code == 0) {
+					alert(data.msg);
+				} else {
+					//alert(data.msg);
+					if (data.msg == "预定"){
+						$("#tableState").text(data.msg);
+						
+					} else {
+						alert("已预定");
+					}
+				}
+			}
+		});  
+	}
+	function backTable(){
+		 var flag = 1;
+		 if (flag == 1){
+			$("#d").val("预定");
+			flag = 0;
+		 } else {
+			$("#d").val("空闲");
+			 flag =1;
+		 }
+	}
+	 */
+	
+	
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
